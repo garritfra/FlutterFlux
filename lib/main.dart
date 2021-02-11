@@ -38,17 +38,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final LocalStorage storage = new LocalStorage(Config.IDENTIFIER_LOCALSTORAGE);
 
+  /// Check if the user token is set.
+  /// If that's not the case, redirect to the config page
+  void checkConfig() async {
+    await storage.ready;
+    dynamic token = await storage.getItem(Config.IDENTIFIER_API_KEY);
+    if (token == null || token.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushNamed(context, "/config");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    /// Check if the user token is set.
-    /// If that's not the case, redirect to the corresponding page
-    void checkToken() {
-      String token = storage.getItem(Config.IDENTIFIER_API_KEY);
-      if (token == null || token.isEmpty) {
-        Navigator.pushNamed(context, "/config");
-      }
-    }
-
+    checkConfig();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -56,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[MaterialButton(onPressed: checkToken)],
+          children: <Widget>[],
         ),
       ),
     );
