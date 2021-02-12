@@ -5,6 +5,7 @@ import 'package:flutterflux/config.dart';
 import 'package:flutterflux/miniflux.dart';
 import 'package:flutterflux/views/user_input_view.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(MyApp());
@@ -62,6 +63,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   void initState() {
     checkConfig().then((success) {
@@ -86,7 +95,15 @@ class _MyHomePageState extends State<MyHomePage> {
             key: UniqueKey(),
             itemBuilder: (BuildContext context, int index) {
               FeedEntry entry = unreadPosts[index];
-              return Card(key: UniqueKey(), child: Text(entry.title));
+              return InkWell(
+                child: Card(
+                  child: ListTile(
+                    key: UniqueKey(),
+                    title: Text(entry.title),
+                  ),
+                ),
+                onTap: () => _launchURL(entry.url),
+              );
             },
           )),
     );

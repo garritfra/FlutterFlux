@@ -9,15 +9,16 @@ class FeedEntry {
   int id;
   String status;
   String title;
+  String url;
 
-  FeedEntry({this.id, this.status, this.title});
+  FeedEntry({this.id, this.status, this.title, this.url});
 
   factory FeedEntry.fromJson(Map<String, dynamic> json) {
     return FeedEntry(
-      id: json["id"],
-      status: json["status"],
-      title: json["title"],
-    );
+        id: json["id"],
+        status: json["status"],
+        title: json["title"],
+        url: json["url"]);
   }
 }
 
