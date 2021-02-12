@@ -22,6 +22,12 @@ class FeedEntry {
   }
 }
 
+enum RequestMethod {
+  get,
+  post,
+  put,
+}
+
 class MinifluxApi {
   final storage = new LocalStorage(Config.IDENTIFIER_LOCALSTORAGE);
   String serverUrl;
@@ -34,7 +40,9 @@ class MinifluxApi {
 
   static final MinifluxApi instance = MinifluxApi._();
 
-  Future<Response> getRequest(String path) async {
+  // TODO: Make DRY
+  Future<Response> request(
+      {RequestMethod method, String path, body: String}) async {
     if (serverUrl == null ||
         serverUrl.isEmpty ||
         apiKey == null ||
@@ -43,14 +51,29 @@ class MinifluxApi {
       return null;
     }
 
-    return await http.get("$serverUrl/v1$path",
-        headers: {"X-Auth-Token": apiKey});
+    switch (method) {
+      // GET is default
+      case RequestMethod.get:
+        break;
+      case RequestMethod.post:
+        return await http
+            .post("$serverUrl/v1$path", headers: {"X-Auth-Token": apiKey});
+        break;
+      case RequestMethod.put:
+        return await http.put("$serverUrl/v1$path",
+            headers: {"X-Auth-Token": apiKey}, body: body);
+        break;
+    }
+
+    return await http
+        .get("$serverUrl/v1$path", headers: {"X-Auth-Token": apiKey});
   }
 
   Future<List<FeedEntry>> getUnreadPosts() async {
     await storage.ready;
 
-    Response response = await getRequest("/entries?status=unread");
+    Response response = await request(
+        method: RequestMethod.get, path: "/entries?status=unread");
     Map<String, dynamic> body = json.decode(response.body);
     List<dynamic> rawEntries = body["entries"];
 
@@ -58,5 +81,16 @@ class MinifluxApi {
     List<FeedEntry> feedEntries = [];
     for (var entry in rawEntries) feedEntries.add(FeedEntry.fromJson(entry));
     return feedEntries;
+  }
+
+  Future markAsRead(int id) async {
+    var body = {
+      "entry_ids": [id],
+      "status": "read"
+    };
+    String encodedBody = json.encode(body);
+    Response res = await request(
+        body: encodedBody, method: RequestMethod.put, path: "/entries");
+    return res;
   }
 }

@@ -65,7 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _readArticle(FeedEntry entry) async {
     if (await canLaunch(entry.url)) {
-      await launch(entry.url);
+      MinifluxApi.instance.markAsRead(entry.id);
+      launch(entry.url);
     } else {
       throw 'Could not launch ${entry.url}';
     }
