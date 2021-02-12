@@ -23,21 +23,34 @@ class FeedEntry {
 }
 
 class MinifluxApi {
-  Future<List<FeedEntry>> getUnreadPosts() async {
-    final storage = new LocalStorage(Config.IDENTIFIER_LOCALSTORAGE);
-    await storage.ready;
+  final storage = new LocalStorage(Config.IDENTIFIER_LOCALSTORAGE);
+  String serverUrl;
+  String apiKey;
 
-    String serverUrl = storage.getItem(Config.IDENTIFIER_SERVER_URL);
-    String apiKey = storage.getItem(Config.IDENTIFIER_API_KEY);
+  MinifluxApi._() {
+    serverUrl = storage.getItem(Config.IDENTIFIER_SERVER_URL);
+    apiKey = storage.getItem(Config.IDENTIFIER_API_KEY);
+  }
 
+  static final MinifluxApi instance = MinifluxApi._();
+
+  Future<Response> getRequest(String path) async {
     if (serverUrl == null ||
         serverUrl.isEmpty ||
         apiKey == null ||
         apiKey.isEmpty) {
-      return [];
+      // TODO: Proper handling
+      return null;
     }
-    Response response = await http.get("$serverUrl/v1/entries?status=unread",
+
+    return await http.get("$serverUrl/v1$path",
         headers: {"X-Auth-Token": apiKey});
+  }
+
+  Future<List<FeedEntry>> getUnreadPosts() async {
+    await storage.ready;
+
+    Response response = await getRequest("/entries?status=unread");
     Map<String, dynamic> body = json.decode(response.body);
     List<dynamic> rawEntries = body["entries"];
 

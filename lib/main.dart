@@ -57,17 +57,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _initUnreadPosts() async {
-    var posts = await MinifluxApi().getUnreadPosts();
+    var posts = await MinifluxApi.instance.getUnreadPosts();
     setState(() {
       unreadPosts = posts;
     });
   }
 
-  _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+  _readArticle(FeedEntry entry) async {
+    if (await canLaunch(entry.url)) {
+      await launch(entry.url);
     } else {
-      throw 'Could not launch $url';
+      throw 'Could not launch ${entry.url}';
     }
   }
 
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: Text(entry.title),
                   ),
                 ),
-                onTap: () => _launchURL(entry.url),
+                onTap: () => _readArticle(entry),
               );
             },
           )),
