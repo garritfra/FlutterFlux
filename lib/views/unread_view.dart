@@ -69,14 +69,22 @@ class _UnreadViewState extends State<UnreadView> {
             key: UniqueKey(),
             itemBuilder: (BuildContext context, int index) {
               FeedEntry entry = unreadPosts[index];
-              return InkWell(
+              return Dismissible(
+                key: UniqueKey(),
+                direction: DismissDirection.horizontal,
+                onDismissed: (direction) {
+                  setState(() {
+                    unreadPosts.removeAt(index);
+                  });
+                  MinifluxApi.instance.markAsRead(entry.id);
+                },
                 child: Card(
                   child: ListTile(
                     key: UniqueKey(),
                     title: Text(entry.title),
+                    onTap: () => _readArticle(entry),
                   ),
                 ),
-                onTap: () => _readArticle(entry),
               );
             },
           ),
