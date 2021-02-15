@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:flutterflux/config.dart';
 import 'package:flutterflux/miniflux.dart';
