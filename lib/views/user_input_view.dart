@@ -28,39 +28,36 @@ class _UserInputViewState extends State<UserInputView> {
         child: Center(
           child: SizedBox(
             width: 400.0,
-            child: Padding(
-              padding: EdgeInsets.all(10.0),
-              child: ListView(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(5.0),
-                      child: TextField(
-                        controller: _serverTextController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(), labelText: "Server"),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(5.0),
-                      child: TextField(
-                        controller: _apiKeyTextController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(), labelText: "API Key"),
-                      ),
-                    ),
-                  ),
-                  Container(
+            child: ListView(
+              children: [
+                Expanded(
+                  child: Container(
                     padding: EdgeInsets.all(5.0),
-                    child: ElevatedButton(
-                      onPressed: _onSubmit,
-                      child: Text("Save"),
+                    child: TextField(
+                      controller: _serverTextController,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(), labelText: "Server"),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(5.0),
+                    child: TextField(
+                      controller: _apiKeyTextController,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(), labelText: "API Key"),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(5.0),
+                  child: ElevatedButton(
+                    onPressed: _onSubmit,
+                    child: Text("Save"),
+                  ),
+                )
+              ],
             ),
           ),
         ),
