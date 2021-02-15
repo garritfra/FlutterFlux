@@ -3,6 +3,7 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:flutterflux/config.dart';
 import 'package:flutterflux/miniflux.dart';
+import 'package:flutterflux/views/unread_view.dart';
 import 'package:flutterflux/views/user_input_view.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FlutterFlux',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Color(0xff004e98),
+        accentColor: Color(0xffff6700),
       ),
       initialRoute: "/",
       routes: {
@@ -40,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedNavIndex = 0;
   final LocalStorage storage = new LocalStorage(Config.IDENTIFIER_LOCALSTORAGE);
   List<FeedEntry> unreadPosts = [];
 
@@ -56,6 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return true;
   }
 
+  void _onNavItemTapped(int index) {
+    setState(() {
+      _selectedNavIndex = index;
+    });
+  }
+
   void _initUnreadPosts() async {
     var posts = await MinifluxApi.instance.getUnreadPosts();
     setState(() {
@@ -63,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  _readArticle(FeedEntry entry) async {
+  void _readArticle(FeedEntry entry) async {
     if (await canLaunch(entry.url)) {
       MinifluxApi.instance.markAsRead(entry.id);
       launch(entry.url);
@@ -83,39 +92,69 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  static List<Widget> _widgetOptions = <Widget>[
+    UnreadView(
+      key: UniqueKey(),
+    ),
+    Container(
+      color: Colors.blue,
+    ),
+    Container(
+      color: Colors.red,
+    ),
+    Container(
+      color: Colors.yellow,
+    ),
+    Container(
+      color: Colors.green,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
-            onPressed: () {
-              Navigator.pushNamed(context, "/config");
-            },
-          ),
-        ],
-        title: Text(widget.title),
-      ),
-      body: Center(
-          key: UniqueKey(),
-          child: ListView.builder(
-            itemCount: unreadPosts.length,
-            key: UniqueKey(),
-            itemBuilder: (BuildContext context, int index) {
-              FeedEntry entry = unreadPosts[index];
-              return InkWell(
-                child: Card(
-                  child: ListTile(
-                    key: UniqueKey(),
-                    title: Text(entry.title),
-                  ),
-                ),
-                onTap: () => _readArticle(entry),
-              );
-            },
-          )),
-    );
+        appBar: AppBar(
+          foregroundColor: Theme.of(context).colorScheme.primary,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: 'Settings',
+              onPressed: () {
+                Navigator.pushNamed(context, "/config");
+              },
+            ),
+          ],
+          title: Text(widget.title),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.new_releases_outlined),
+              label: 'Unread',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.star),
+              label: 'Starred',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article),
+              label: 'Feeds',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: 'Categories',
+            ),
+          ],
+          currentIndex: _selectedNavIndex,
+          onTap: _onNavItemTapped,
+          backgroundColor: Colors.black,
+          unselectedItemColor: Theme.of(context).colorScheme.secondaryVariant,
+          selectedItemColor: Theme.of(context).colorScheme.secondary,
+        ),
+        body: _widgetOptions[_selectedNavIndex]);
   }
 }
