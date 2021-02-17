@@ -62,6 +62,13 @@ class _UnreadViewState extends State<UnreadView> {
 
   @override
   Widget build(BuildContext context) {
+    if (unreadPosts.isEmpty) {
+      return Container(
+        child: Center(
+          child: Text("All done!"),
+        ),
+      );
+    }
     return Container(
         key: UniqueKey(),
         child: Center(
