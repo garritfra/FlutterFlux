@@ -70,6 +70,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _markAllAsRead() async {
+    await MinifluxApi.instance.markAllAsRead();
+    _initUnreadPosts();
+  }
+
   @override
   void initState() {
     checkConfig().then((success) {
@@ -111,6 +116,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.pushNamed(context, "/config");
               },
+            ),
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: _markAllAsRead,
             ),
           ],
           title: Text(widget.title),

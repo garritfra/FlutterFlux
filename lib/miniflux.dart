@@ -107,4 +107,14 @@ class MinifluxApi {
         body: encodedBody, method: RequestMethod.put, path: "/entries");
     return res;
   }
+
+  Future markAllAsRead() async {
+    Response res = await request(method: RequestMethod.get, path: "/me");
+    dynamic user = json.decode(res.body);
+    int userId = user["id"];
+    await request(
+        method: RequestMethod.put,
+        path: "/users/$userId/mark-all-as-read",
+        body: {});
+  }
 }
