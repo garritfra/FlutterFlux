@@ -5,20 +5,34 @@ import 'package:localstorage/localstorage.dart';
 import 'config.dart';
 import 'package:http/http.dart' as http;
 
+class Feed {
+  int id;
+  String url;
+  String title;
+
+  Feed({this.id, this.url, this.title});
+
+  factory Feed.fromJson(Map<String, dynamic> json) {
+    return Feed(id: json["id"], url: json["url"], title: json["title"]);
+  }
+}
+
 class FeedEntry {
   int id;
   String status;
   String title;
   String url;
+  Feed feed;
 
-  FeedEntry({this.id, this.status, this.title, this.url});
+  FeedEntry({this.id, this.status, this.title, this.url, this.feed});
 
   factory FeedEntry.fromJson(Map<String, dynamic> json) {
     return FeedEntry(
         id: json["id"],
         status: json["status"],
         title: json["title"],
-        url: json["url"]);
+        url: json["url"],
+        feed: Feed.fromJson(json["feed"]));
   }
 }
 

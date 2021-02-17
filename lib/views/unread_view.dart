@@ -41,6 +41,9 @@ class _UnreadViewState extends State<UnreadView> {
     if (await canLaunch(entry.url)) {
       MinifluxApi.instance.markAsRead(entry.id);
       launch(entry.url);
+      setState(() {
+        unreadPosts.remove(entry);
+      });
     } else {
       throw 'Could not launch ${entry.url}';
     }
@@ -56,8 +59,6 @@ class _UnreadViewState extends State<UnreadView> {
 
     super.initState();
   }
-
-  static const List<Widget> _widgetOptions = <Widget>[];
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +83,7 @@ class _UnreadViewState extends State<UnreadView> {
                   child: ListTile(
                     key: UniqueKey(),
                     title: Text(entry.title),
+                    subtitle: Text(entry.feed.title),
                     onTap: () => _readArticle(entry),
                   ),
                 ),
